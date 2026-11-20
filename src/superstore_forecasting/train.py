@@ -21,7 +21,11 @@ from superstore_forecasting.model import MODELS, forecast_models
 
 
 def evaluate_walk_forward(
-    monthly: pd.DataFrame, start: str = EVAL_START, end: str = EVAL_END
+    monthly: pd.DataFrame,
+    start: str = EVAL_START,
+    end: str = EVAL_END,
+    *,
+    alpha: float = RIDGE_ALPHA,
 ) -> tuple[pd.DataFrame, dict]:
     """Predict each evaluation month using only months strictly before it."""
     months = pd.period_range(start, end, freq="M")
@@ -30,7 +34,9 @@ def evaluate_walk_forward(
 
     rows = []
     for month in months:
-        forecast_month, forecasts = forecast_models(monthly.loc[monthly.index < month])
+        forecast_month, forecasts = forecast_models(
+            monthly.loc[monthly.index < month], alpha=alpha
+        )
         if forecast_month != month:
             raise ValueError(f"Forecast cutoff does not precede {month}.")
         rows.append(
@@ -55,7 +61,7 @@ def evaluate_walk_forward(
         "folds": len(months),
         "horizon_months": 1,
         "season_months": SEASON,
-        "ridge_alpha": RIDGE_ALPHA,
+        "ridge_alpha": alpha,
         "metrics": metrics,
         "selected_model": selected,
     }

@@ -11,6 +11,7 @@ from uuid import uuid4
 import mlflow
 import mlflow.sklearn
 import pandas as pd
+from mlflow import MlflowClient
 from mlflow.models import infer_signature
 
 from superstore_forecasting.config import (
@@ -37,6 +38,7 @@ from superstore_forecasting.train import evaluate_walk_forward
 
 TRACKING_URI = "http://127.0.0.1:5000"
 EXPERIMENT = "superstore-monthly-sales"
+REGISTERED_MODEL = "superstore-monthly-forecast"
 
 
 def next_feature_row(monthly: pd.DataFrame) -> pd.DataFrame:
@@ -112,7 +114,7 @@ def _log_run(
         }
 
 
-def run_experiments(path: Path = RAW_PATH) -> dict:
+def run_experiments(path: Path = RAW_PATH, *, register_best: bool = False) -> dict:
     """Run fixed temporal experiments against the configured MLflow backend."""
     with path.open("rb") as source:
         dataset_hash = hashlib.file_digest(source, "sha256").hexdigest()
@@ -176,6 +178,24 @@ def run_experiments(path: Path = RAW_PATH) -> dict:
         "tuning": trials,
         "holdout": comparison,
     }
+    if register_best:
+        winner = comparison[selected_model]
+        registered = mlflow.register_model(winner["model_uri"], REGISTERED_MODEL)
+        client = MlflowClient()
+        for tag, value in {
+            "validation_status": "backtested",
+            "algorithm": selected_model,
+            "trained_through": winner["trained_through"],
+            "dataset_sha256": dataset_hash,
+            "comparison_id": comparison_id,
+        }.items():
+            client.set_model_version_tag(
+                registered.name, registered.version, tag, value
+            )
+        result["registered_model"] = {
+            "name": registered.name,
+            "version": registered.version,
+        }
     return result
 
 
@@ -192,9 +212,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=RAW_PATH)
     parser.add_argument("--tracking-uri", default=None)
+    parser.add_argument("--register-best", action="store_true")
     args = parser.parse_args()
     configure_tracking(args.tracking_uri)
-    print(json.dumps(run_experiments(args.input), indent=2))
+    print(
+        json.dumps(
+            run_experiments(args.input, register_best=args.register_best), indent=2
+        )
+    )
 
 
 if __name__ == "__main__":

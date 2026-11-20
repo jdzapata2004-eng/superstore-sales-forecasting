@@ -221,3 +221,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local data, generated results and credentials
+/data/raw/
+/artifacts/
+.env.*
+!.env.example
+kaggle.json
+.kaggle/
+*.pem
+*.key

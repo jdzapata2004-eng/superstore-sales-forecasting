@@ -231,3 +231,15 @@ kaggle.json
 .kaggle/
 *.pem
 *.key
+
+# Local MLflow tracking and registry
+/mlruns/
+/mlartifacts/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.joblib
+*.pkl

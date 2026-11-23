@@ -109,6 +109,42 @@ uv run --locked python -m superstore_forecasting.registry predict --through 2018
 a otro servidor. El tracking y el registro usan el mismo backend.
 `mlflow.db`, `mlartifacts/` y `mlruns/` se mantienen fuera de Git.
 
+## Notebooks de análisis
+
+Instala el grupo de notebooks y descarga el snapshot desde la raíz:
+
+```text
+uv sync --locked --group dev --group notebooks --python 3.11 --link-mode copy
+uv run --locked python -m scripts.download_data
+code notebooks/01_eda.ipynb notebooks/02_feature_engineering.ipynb notebooks/03_mlflow_experiments.ipynb
+```
+
+En VS Code, con las extensiones Python y Jupyter, selecciona el intérprete
+del entorno `.venv` como kernel de cada notebook y ejecuta **Run All**.
+El intérprete está en `.venv/Scripts/python.exe` en Windows y en
+`.venv/bin/python` en Linux y macOS.
+
+| Notebook | Contenido |
+|---|---|
+| `01_eda.ipynb` | Calidad del dato, distribución, totales por categoría y región, tendencia, crecimiento interanual y estacionalidad. |
+| `02_feature_engineering.ipynb` | Agregación mensual, objetivo, rezagos y ventanas walk-forward. |
+| `03_mlflow_experiments.ipynb` | Consultas de solo lectura de corridas, métricas, artefactos, versiones y alias. |
+
+Inicia MLflow como se indica en la sección anterior para ver los resultados
+del tercer notebook. Debe existir un lote completo en el backend. Si el
+servidor está vacío, ejecuta el comando de experimentos del README sin
+`--register-best` para generar corridas sin registrar una versión.
+El notebook muestra el alias y las versiones cuando el registro los contiene.
+
+Para ejecutar los tres con kernels nuevos y guardar copias con resultados
+en el directorio local ignorado por Git:
+
+```text
+uv run --locked --group notebooks jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=180 --output-dir=artifacts/notebooks notebooks/01_eda.ipynb notebooks/02_feature_engineering.ipynb notebooks/03_mlflow_experiments.ipynb
+```
+
+Mantén los notebooks fuente sin salidas guardadas al versionarlos.
+
 ## Interfaces de integración
 
 | Responsabilidad | Interfaz |

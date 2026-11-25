@@ -12,6 +12,7 @@ dependencies = [
     "mlflow>=3.5,<4",
     "numpy>=1.26",
     "pandas>=2.2,<3",
+    "prefect>=3.9.5",
     "scikit-learn>=1.5",
     "uvicorn[standard]>=0.30",
 ]

@@ -24,7 +24,23 @@ def load_orders(path: str | Path = RAW_PATH) -> pd.DataFrame:
 
     Postal codes remain strings, with missing values preserved for EDA.
     """
-    orders = pd.read_csv(path, dtype="string", keep_default_na=False)
+    path = Path(path)
+
+    # Detectar dinámicamente si el archivo es un ZIP (como el de Kaggle) o un CSV normal (tests)
+    compression = None
+    if path.is_file():
+        with path.open("rb") as f:
+            if f.read(2) == b"PK":
+                compression = "zip"
+
+    orders = pd.read_csv(
+        path,
+        dtype="string",
+        keep_default_na=False,
+        compression=compression,
+        encoding="latin-1",
+    )
+
     missing = REQUIRED_COLUMNS.difference(orders.columns)
     if missing:
         raise ValueError(f"Missing columns: {', '.join(sorted(missing))}")
@@ -42,6 +58,7 @@ def load_orders(path: str | Path = RAW_PATH) -> pd.DataFrame:
         or parsed_dates.isna().any()
     ):
         raise ValueError("Order Date must contain valid dates in dd/mm/yyyy format.")
+
     sales = pd.to_numeric(orders["Sales"], errors="coerce").astype(float)
     if not (np.isfinite(sales) & sales.gt(0)).all():
         raise ValueError("Sales must contain only finite, positive numbers.")

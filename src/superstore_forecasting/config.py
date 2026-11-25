@@ -4,7 +4,7 @@ from pathlib import Path
 
 DATASET = "rohitsahoo/sales-forecasting/versions/2"
 FILENAME = "train.csv"
-SHA256 = "dbb0f167b27ccf02d7ff8cb0446a9abc6dbc3522e83cf9daa6939801acfdd196"
+SHA256 = "a9b35af6cf9530e61d42ec22ef6d485799c0ee7d2e4710f1f803a71b8f1c29cb"
 RAW_PATH = Path("data/raw") / FILENAME
 ARTIFACTS = Path("artifacts")
 EVAL_START = "2018-01"

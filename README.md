@@ -1,5 +1,7 @@
 # Superstore Sales Forecasting
 
+[![CI Pipeline](https://github.com/jdzapata2004-eng/superstore-sales-forecasting/actions/workflows/ci.yml/badge.svg)](https://github.com/jdzapata2004-eng/superstore-sales-forecasting/actions/workflows/ci.yml)
+
 ## Problema, objetivo y criterios de éxito
 
 El área comercial necesita anticipar las ventas totales del próximo mes para preparar su plan, revisar la meta de ventas y prever recursos. El objetivo es generar un único pronóstico agregado para el mes calendario siguiente al último mes cerrado, sin desglose por región, categoría ni producto.

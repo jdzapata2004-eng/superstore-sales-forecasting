@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from scripts import download_data as downloader
+from superstore_forecasting import download as downloader
 
 
 @pytest.mark.parametrize("valid", [True, False])
